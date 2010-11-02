@@ -8,19 +8,31 @@ require_once('Browser.php');
 require_once('h_bigpipe.inc');
 require_once('h_pagelet.inc');
 
+$use_padding = true;
+
+if (isset($_REQUEST['disable_padding'])) {
+   $use_padding = false;
+}
+
 function test_delayed_rendering($msg)
 {
+	global $use_padding;
 	// Simulate some long operation
 	usleep(100000); // 100 ms
         $padding = '';
-        for ($i = 0; $i < 8192; $i++) { $padding .= ' '; }
+	if ($use_padding) {
+	        for ($i = 0; $i < 8192; $i++) { $padding .= ' '; }
+	}
 	return "$msg <!-- $padding -->\n";
 }
 
 function test_simple_replace($msg)
 {
+	global $use_padding;
 	$padding = '';
-        for ($i = 0; $i < 8192; $i++) { $padding .= ' '; }
+	if ($use_padding) {
+	        for ($i = 0; $i < 8192; $i++) { $padding .= ' '; }
+	}
 	return "$msg <!-- $padding --><br>\n";
 }
 
@@ -55,9 +67,20 @@ function get_google_analytics_script($code)
 	</head>
 	<body>
 		<h1 id="header">BigPipe test.</h1>
+<?php
+	if ($use_padding) {
+?>
+		<p>This version uses padding to fill out browser caches so that the bigpipe delayed rendering effect can be seen easily. This causes problems with firebug, because the page content is big. Use <a href="example.php?disable_padding=1">this</a> link to disable the padding so you can use firebug more easily. 
+<?php
+	} else {
+?>
+		<p>The padding has been disabled. The page load takes much longer because there's still some sleep() delays inside.</p>
+<?php
+	}
+?>
 		<!-- simulate that the page is much bigger than it is. Browsers have internal buffering which hides how bigpipe actual works.
 					 This allows us to simulate real world effect with a big page. -->
-		<!-- <?php for ($i = 0; $i < 128000; $i++) { echo ' '; } ?> -->
+		<!-- <?php if ($use_padding) { for ($i = 0; $i < 128000; $i++) { echo ' '; } } ?> -->
 
 		<h2>Simple content replace</h2>
 <?php
