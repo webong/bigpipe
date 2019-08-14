@@ -3,7 +3,8 @@
 /**
  * Main class for BigPipe rendering.
  */
-class BigPipe {
+class BigPipe
+{
 	/**
 	 * Two dimension array which contains each pagelet definition.
 	 *  - First key is the pagelet priority
@@ -49,7 +50,8 @@ class BigPipe {
 	 * @static
 	 * @return bool
 	 */
-	private static function check_for_enabling() {
+	private static function check_for_enabling()
+	{
 
 		// Allow any user to always force bigpipe to on if he really wants
 		if (isset($_REQUEST['bigpipe'])) {
@@ -99,14 +101,16 @@ class BigPipe {
 	 * @static
 	 * @return bool
 	 */
-	public static function is_enabled() {
+	public static function is_enabled()
+	{
 		if (self::$enabled === null) {
 			self::$enabled = self::check_for_enabling();
 		}
 		return self::$enabled;
 	}
 
-	public static function disable() {
+	public static function disable()
+	{
 		self::$enabled = false;
 	}
 
@@ -116,7 +120,8 @@ class BigPipe {
 	 * @param Pagelet $pagelet
 	 * @return void
 	 */
-	public static function add_pagelet($id, Pagelet $pagelet) {
+	public static function add_pagelet($id, Pagelet $pagelet)
+	{
 		self::$pagelets[$pagelet->priority][$id] = $pagelet;
 		self::$pagelet_count++;
 	}
@@ -129,12 +134,13 @@ class BigPipe {
 	 * Simply call BigPipe::register_controller($this); in the beginning of all your controllers and
 	 * BigPipe::render($this); at the end, the render will only take place when $this is the same
 	 * than the first registered controller.
-     *
+	 *
 	 * @static
 	 * @param  $controller
 	 * @return void
 	 */
-	public static function register_controller($controller) {
+	public static function register_controller($controller)
+	{
 		if (self::$top_controller == null) {
 			self::$top_controller = $controller;
 		}
@@ -144,7 +150,8 @@ class BigPipe {
 	 * Renders all pagelets in queue.
 	 * @return void
 	 */
-	public static function render($calling_controller = null) {
+	public static function render($calling_controller = null)
+	{
 
 		// Prevent misbehaviour when using nested controllers.
 		if ($calling_controller != null && self::$top_controller != $calling_controller) {
@@ -159,7 +166,7 @@ class BigPipe {
 			return;
 		}
 
-		if ($_REQUEST['bigpipe'] == 2) {
+		if (isset($_REQUEST['bigpipe']) && $_REQUEST['bigpipe'] == 2) {
 			return;
 		}
 
@@ -176,7 +183,7 @@ class BigPipe {
 		if (!self::$pagelet_count) {
 			return;
 		}
-		
+
 		// Sort all pagelets according to their priority (highest priority => rendered first)
 		ksort(self::$pagelets);
 		self::$pagelets = array_reverse(self::$pagelets);
@@ -204,7 +211,6 @@ class BigPipe {
 		self::$enabled = false;
 		echo '</html><!--html end tag from bigpipe renderer-->';
 		flush();
-
 	}
 
 	/**
@@ -212,7 +218,8 @@ class BigPipe {
 	 * @param  $data
 	 * @return void
 	 */
-	private static function print_single_response($data) {
+	private static function print_single_response($data)
+	{
 		static $uniq_counter = 0;
 		$uniq_counter++;
 		echo '<script id="' . $data['id'] . '_' . $uniq_counter . '">';
@@ -232,16 +239,18 @@ class BigPipe {
 	 * @param  $user_agent
 	 * @return int
 	 */
-	public static function is_bot() {
+	public static function is_bot()
+	{
 		$user_agent = $_SERVER['HTTP_USER_AGENT'];
 
 		//if no user agent is supplied then assume it's a bot
-		if($user_agent == "") {
+		if ($user_agent == "") {
 			return true;
 		}
 
 		//array of bot strings to check for
-		$bot_strings = Array(  "google",     "bot",
+		$bot_strings = array(
+			"google",     "bot",
 			"yahoo",     "spider",
 			"archiver",   "curl",
 			"python",     "nambu",
@@ -254,8 +263,8 @@ class BigPipe {
 			"facebookexternal"
 		);
 
-		foreach($bot_strings as $bot) {
-			if(strpos($user_agent,$bot) !== false) {
+		foreach ($bot_strings as $bot) {
+			if (strpos($user_agent, $bot) !== false) {
 				return true;
 			}
 		}
@@ -264,9 +273,9 @@ class BigPipe {
 	}
 
 
-	public static function add_domloaded($source) {
+	public static function add_domloaded($source)
+	{
 		self::$javascripts[] = "try { $source } catch (ex) { if (typeof console == 'object') { console.log(ex); } if (typeof logError == 'function') { if (typeof ex == 'object') { logError(ex.name + ': ' + ex.message, ex.fileName, ex.lineNumber, ex.stack); } else { logError(ex, 'Exception', 0); } } }";
-
 	}
 
 	/**
@@ -275,7 +284,8 @@ class BigPipe {
 	 * @param   string  $source
 	 * @return  string
 	 */
-	public static function source($source) {
+	public static function source($source)
+	{
 		return "<script type=\"text/javascript\">\n//<![CDATA[\n" . $source . "\n//]]>\n</script>";
 	}
 }

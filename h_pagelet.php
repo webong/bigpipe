@@ -36,7 +36,8 @@
  */
 
 
-class Pagelet {
+class Pagelet
+{
 
 	/**
 	 * Unique id for this pagelet. This will also be used as the corresponding html element id.
@@ -105,7 +106,8 @@ class Pagelet {
 	 * @param $arguments
 	 * @return void
 	 */
-	public function __construct($id, $callback = null, $priority = 10, $arguments = null) {
+	public function __construct($id, $callback = null, $priority = 10, $arguments = null)
+	{
 		$this->id = $id;
 		$this->callback = $callback;
 		$this->arguments = $arguments;
@@ -120,15 +122,18 @@ class Pagelet {
 		}
 	}
 
-	public function add_css($file) {
+	public function add_css($file)
+	{
 		$this->css_files[] = $file;
 	}
 
-	public function add_content($str) {
+	public function add_content($str)
+	{
 		$this->content .= $str;
 	}
 
-	public function add_javascript($file) {
+	public function add_javascript($file)
+	{
 		if (BigPipe::is_enabled()) {
 			$this->javascript_files[] = $file;
 		} else {
@@ -136,30 +141,34 @@ class Pagelet {
 		}
 	}
 
-	public function add_javascript_code($code) {
+	public function add_javascript_code($code)
+	{
 		$this->javascript_code .= $code;
 	}
 
-	protected function execute_callback() {
-		if ($this->callback != null) {
-			if ($this->arguments == null) {
-				$ret = call_user_func($this->callback);
-			} else {
-				$ret = call_user_func_array($this->callback, $this->arguments);
-			}
+	protected function execute_callback()
+	{
+		if (is_null($this->callback)) 
+			return;
+
+		if ($this->arguments == null) {
+			$ret = call_user_func($this->callback);
+		} else {
+			$ret = call_user_func_array($this->callback, $this->arguments);
 		}
 
 		return $ret;
 	}
 
-	protected function get_content() {
+	protected function get_content()
+	{
 		if ($this->bypass_container == null) {
 			$ret = $this->execute_callback();
 		} else {
 			$ret = $this->bypass_container;
 		}
 
-		$data = array();
+		$data = [];
 
 		if ($ret instanceof ViewBox) {
 			$data['js_code'] = $ret->get_javascript();
@@ -170,27 +179,30 @@ class Pagelet {
 
 		$data['innerHTML'] .= $this->content;
 		return $data;
-
 	}
 
 
-	public function render_data() {
+	public function render_data()
+	{
 		//Logger::debug("Rendering pagelet: " . $this->id);
 		$data = $this->get_content();
 		//Logger::debug("content: " . print_r($data, 1));
 		$data['id'] = $this->id;
 		$data['css_files'] = $this->css_files;
 		$data['js_files'] = $this->javascript_files;
-		$data['js_code'] .= $this->javascript_code;
+		isset($data['js_code']) ? 
+			$data['js_code'] .= $this->javascript_code :
+			$data['js_code'] = $this->javascript_code;
 
 		return $data;
 	}
 
-	public function __toString() {
+	public function __toString()
+	{
 		if (BigPipe::is_enabled()) {
-		   	if ($this->use_span) {
+			if ($this->use_span) {
 				return '<span id="' . $this->id . '"></span>';
-			} else {			
+			} else {
 				return '<div id="' . $this->id . '"></div>';
 			}
 		} else {
@@ -205,6 +217,4 @@ class Pagelet {
 			return $str;
 		}
 	}
-
 }
-
