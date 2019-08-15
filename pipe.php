@@ -1,8 +1,19 @@
 <?php
-header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
-header("Pragma: no-cache");
-header("Content-Type: text/html");
+
+$time = microtime();
+
+$time = explode(' ', $time);
+
+$time = $time[1] + $time[0];
+
+$start = $time;
+?>
+
+<?php
+// header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+// header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+// header("Pragma: no-cache");
+// header("Content-Type: text/html");
 
 require_once('Browser.php');
 require_once('h_bigpipe.php');
@@ -125,3 +136,16 @@ function test_simple_replace($msg)
 
 		echo "</body>\n";
 		BigPipe::render();
+
+		$time = microtime();
+	
+		$time = explode(' ', $time);
+		
+		$time = $time[1] + $time[0];
+	
+		$finish = $time;
+	
+		$total_time = round(($finish - $start), 4);
+	
+		echo 'Page loaded time : ' . $total_time . ' seconds.';
+	
